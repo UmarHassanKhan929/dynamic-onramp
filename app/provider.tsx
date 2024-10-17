@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
@@ -17,8 +18,8 @@ export default function Provider({ children }: any) {
   const setUser = useUserStore((state) => state.setUser);
   const setWallet = useUserStore((state) => state.setWallet);
 
-  const user = useUserStore((state) => state.user);
-  const wallet = useUserStore((state) => state.wallet);
+  // const user = useUserStore((state) => state.user);
+  // const wallet = useUserStore((state) => state.wallet);
 
   return (
     <DynamicContextProvider
