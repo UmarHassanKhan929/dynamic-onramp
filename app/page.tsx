@@ -17,9 +17,9 @@ export default function Home() {
 
   const { primaryWallet, walletConnector } = useDynamicContext();
 
-  const { openFunding } = useFunding();
+  const { openFunding, enabled } = useFunding();
 
-  const PRIMARY_CHAIN_ID = 80002;
+  const PRIMARY_CHAIN_ID = 137;
 
   const signMessage = async () => {
     setSignature(null);
@@ -75,6 +75,9 @@ export default function Home() {
       if (walletConnector?.supportsNetworkSwitching()) {
         await walletConnector?.switchNetwork({ networkChainId: PRIMARY_CHAIN_ID });
         console.log("Success, Network switched");
+
+        console.log("primaryWallet dun dun", primaryWallet);
+        console.log("walletConnector dun dun", walletConnector);
       }
       console.log("primaryWallet fields", primaryWallet?.chain);
 
@@ -97,56 +100,69 @@ export default function Home() {
       console.log("low funds: ", isInsufficientFundsError(e))
       if (isInsufficientFundsError(e)) {
         console.log("Insufficient funds");
-        openFunding().then(() => {
-          console.log("Funding modal opened");
-        });
+        if (enabled) {
+          console.log("Funding modal opening");
+          openFunding(
+            //   {
+            //   token: 
+            // }
+          ).then(() => {
+            console.log("Funding modal opened");
+          });
+        }
+      } else {
+        console.log(e);
       }
     }
   };
 
+  console.log("enabled:", enabled)
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <div className="flex w-full justify-between">
-        <DynamicConnectButton buttonClassName="py-2 px-4 bg-neutral-800 flex text-white items-center justify-center rounded-xl hover:bg-slate-600">
-          Connect via Dynamic
-        </DynamicConnectButton>
-        {primaryWallet ? (
-          <>
-            <div className="p-2 ">
-              <DynamicUserProfile />
-            </div>
-            <div className="p-2 ">
-              <DynamicNav />
-            </div>
-          </>
-        ) : null}
+    <>
+      {/* <div className={`${enabled && "blur-md"} bg-white opacity-50 w-full h-full`}></div> */}
+      <div className={`grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}>
+        <div className="flex w-full justify-between">
+          <DynamicConnectButton buttonClassName="py-2 px-4 bg-neutral-800 flex text-white items-center justify-center rounded-xl hover:bg-slate-600">
+            Connect via Dynamic
+          </DynamicConnectButton>
+          {primaryWallet ? (
+            <>
+              <div className="p-2 ">
+                <DynamicUserProfile />
+              </div>
+              <div className="p-2 ">
+                <DynamicNav />
+              </div>
+            </>
+          ) : null}
 
-        {primaryWallet ? (
-          <>
-            <button
-              className="px-4 bg-neutral-800 flex items-center text-white justify-center rounded-xl hover:bg-slate-600"
-              onClick={signMessage}
-            >
-              Sign a Message By Primary Wallet
-            </button>
-            <button
-              className="px-4 bg-neutral-800 flex items-center text-white justify-center rounded-xl hover:bg-slate-600"
-              onClick={handlePurchase}
-            >
-              Purchase
-            </button>
-          </>
-        ) : null}
-      </div>
-      <div className="flex w-full justify-between">
-        {signature ? (
-          <div className="px-4 max-w-[600px] text-wrap whitespace-pre-wrap">
-            <h2>Signature To Your Identity Prove</h2>
-            <p>{signature}</p>
-          </div>
-        ) : null}
-      </div>
-    </div >
+          {primaryWallet ? (
+            <>
+              <button
+                className="px-4 bg-neutral-800 flex items-center text-white justify-center rounded-xl hover:bg-slate-600"
+                onClick={signMessage}
+              >
+                Sign a Message By Primary Wallet
+              </button>
+              <button
+                className="px-4 bg-neutral-800 flex items-center text-white justify-center rounded-xl hover:bg-slate-600"
+                onClick={handlePurchase}
+              >
+                Purchase
+              </button>
+            </>
+          ) : null}
+        </div>
+        <div className="flex w-full justify-between">
+          {signature ? (
+            <div className="px-4 max-w-[600px] text-wrap whitespace-pre-wrap">
+              <h2>Signature To Your Identity Prove</h2>
+              <p>{signature}</p>
+            </div>
+          ) : null}
+        </div>
+      </div >
+    </>
   );
 }
